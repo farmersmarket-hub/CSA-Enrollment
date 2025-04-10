@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSA Enrollment Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-emerald-200 via-lime-200 to-amber-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white bg-opacity-80 backdrop-blur-md shadow-xl rounded-2xl p-8 w-full max-w-xl h-[85vh] overflow-y-auto">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">CSA Enrollment Form</h2>
+    <form class="space-y-4">
+      <div>
+        <label for="firstName" class="block font-semibold text-gray-700">Enrollee First Name<span class="text-red-500"> *</span></label>
+        <input type="text" id="firstName" name="firstName" required class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+      </div>
+
+      <div>
+        <label for="lastName" class="block font-semibold text-gray-700">Enrollee Last Name<span class="text-red-500"> *</span></label>
+        <input type="text" id="lastName" name="lastName" required class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+      </div>
+
+      <div>
+        <label for="enrollDate" class="block font-semibold text-gray-700">Enrollment Date<span class="text-red-500"> *</span></label>
+        <input type="date" id="enrollDate" name="enrollDate" required class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+      </div>
+
+      <div>
+        <label for="program" class="block font-semibold text-gray-700">PGL Program/Event where enrolled<span class="text-red-500"> *</span></label>
+        <select id="program" name="program" required class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+          <option value="">- Select -</option>
+          <option value="REACH Market">REACH Market</option>
+          <option value="CSA Pickup">CSA Pickup</option>
+          <option value="Outreach Event">Outreach Event</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="neighborId" class="block font-semibold text-gray-700">Neighbor ID (if applicable)</label>
+        <input type="text" id="neighborId" name="neighborId" class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+      </div>
+
+      <div>
+        <label for="householdSize" class="block font-semibold text-gray-700">Household Size<span class="text-red-500"> *</span></label>
+        <input type="number" id="householdSize" name="householdSize" required min="1" class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+      </div>
+
+      <div>
+        <label for="bagSize" class="block font-semibold text-gray-700">CSA Bag Size</label>
+        <input type="text" id="bagSize" name="bagSize" readonly class="w-full mt-1 p-2 border rounded-md bg-gray-100">
+      </div>
+
+      <div>
+        <label for="info" class="block font-semibold text-gray-700">Other Information</label>
+        <textarea id="info" name="info" rows="3" class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"></textarea>
+      </div>
+
+      <div class="flex justify-center">
+		<button type="submit" class="px-6 py-3 bg-gradient-to-r from-emerald-400 to-lime-500 text-white font-semibold rounded-full hover:from-lime-500 hover:to-emerald-400 transition-transform transform hover:scale-105">Submit</button>
+	  </div>
+	  
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('householdSize').addEventListener('input', function () {
+      const size = parseInt(this.value);
+      const bagInput = document.getElementById('bagSize');
+      if (size <= 2) {
+        bagInput.value = 'Small';
+      } else {
+        bagInput.value = 'Large';
+      }
+    });
+  </script>
+</body>
+</html>
