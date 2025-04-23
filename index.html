@@ -228,10 +228,10 @@
     checkboxes.forEach(cb => {
       if (cb.value === "Other") {
         if (otherProgramInput) {
-          selected.push(otherProgramInput); // Replace 'Other' with user input
+          selectedPglPrograms.push(otherProgramInput); // Replace 'Other' with user input
         }
       } else {
-        selected.push(cb.value);
+        selectedPglPrograms.push(cb.value);
       }
     });
     allPglPrograms = selectedPglPrograms.join(", "); // Combine selected values into a single string
@@ -254,7 +254,7 @@
 	document.getElementById("csaEnrollmentForm").reset();
 	window.scrollTo({ top: 0, behavior: 'smooth' });
 
-	fetch('https://script.google.com/macros/s/AKfycbzmZZrg8qiyBwzj-IzB4-OzsHPp-lxi1IK4gX73gCXHwFI5Pc0gF8bc3jqxZT47XXUzLQ/exec', {
+	fetch('https://script.google.com/macros/s/AKfycbw5_Yneunsr3boKL-5w2XABtsqXdJvNVs0hP0R5EhbABHIf7ZTnr0t8TjPR--0SGyrezw/exec', {
 	  method: 'POST',
 	  headers: {
 		'Content-Type': 'text/plain;charset=utf-8',
