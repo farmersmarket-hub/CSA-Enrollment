@@ -8,8 +8,9 @@
 </head>
 <body class="bg-gradient-to-br from-emerald-200 via-lime-200 to-amber-100 min-h-screen flex items-center justify-center">
   <div class="bg-white bg-opacity-80 backdrop-blur-md shadow-xl rounded-2xl p-8 w-full max-w-xl h-[85vh] overflow-y-auto">
+	<div id="successMessage" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert"></div>
     <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">CSA Enrollment Form</h2>
-    <form class="space-y-4">
+    <form class="space-y-4" id="csaEnrollmentForm" onsubmit="generateEnrolleeId(event)">
       <div>
         <label for="firstName" class="block font-semibold text-gray-700">Enrollee First Name<span class="text-red-500"> *</span></label>
         <input type="text" id="firstName" name="firstName" required class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
@@ -27,22 +28,69 @@
 
       <div>
         <label for="program" class="block font-semibold text-gray-700">PGL Program/Event where enrolled<span class="text-red-500"> *</span></label>
-        <select id="program" name="program" required class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+        <select id="program" name="program" required class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400" onchange="toggleOtherProgram()">
           <option value="">- Select -</option>
-          <option value="REACH Market">REACH Market</option>
-          <option value="CSA Pickup">CSA Pickup</option>
-          <option value="Outreach Event">Outreach Event</option>
+          <option value="The People's Market">The People's Market</option>
+          <option value="Juneteenth Event">Juneteenth Event</option>
+          <option value="Other Event">Other Event</option>
+        </select>
+        <input type="text" id="otherProgram" name="otherProgram" placeholder="Specify Other Event" class="w-full mt-2 p-2 border rounded-md hidden">
+      </div>
+
+      <div>
+        <label class="block font-semibold text-gray-700">Which PGL programs are you (or your children) participating in? (select all that apply)</label>
+        <div class="space-y-1">
+          <label><input type="checkbox" name="pglPrograms" value="Youth Summer Camp"> Youth Summer Camp</label><br>
+          <label><input type="checkbox" name="pglPrograms" value="Other 1"> Other 1</label><br>
+          <label><input type="checkbox" name="pglPrograms" value="Other" onchange="toggleOtherProgramParticipation(this)"> Other</label>
+        </div>
+        <input type="text" id="otherProgramParticipation" name="otherProgramParticipation" placeholder="Specify Other Program" class="w-full mt-2 p-2 border rounded-md hidden">
+      </div>
+
+      <div>
+        <label class="block font-semibold text-gray-700">Have you previously attended the market this year?<span class="text-red-500"> *</span></label>
+        <select id="attendedMarket" name="attendedMarket" required class="w-full mt-1 p-2 border rounded-md" onchange="handleMarketAttendance()">
+          <option value="">- Select -</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
         </select>
       </div>
 
-      <div>
-        <label for="neighborId" class="block font-semibold text-gray-700">Neighbor ID (if applicable)</label>
-        <input type="text" id="neighborId" name="neighborId" class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+      <div id="firstDayQuestion" class="hidden">
+        <label class="block font-semibold text-gray-700">Is today your first day at the market?<span class="text-red-500"> *</span></label>
+        <select id="firstDay" name="firstDay" class="w-full mt-1 p-2 border rounded-md" onchange="handleFirstDay()">
+          <option value="">- Select -</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+	  
+	  <div id="attendeeIdField" class="hidden">
+        <label for="attendeeId" class="block font-semibold text-gray-700">Attendee ID <span style='color: red;'>*</span></label>
+        <input type="text" id="attendeeId" name="attendeeId" class="w-full p-2 border rounded-md" required onchange="fetchNeighborId()">
+       </div>
+
+      <div id="neighborIdField" class="hidden">
+        <label for="neighborId" class="block font-semibold text-gray-700">Neighbor ID <span style='color: red;'>*</span></label>
+		<div class="relative">
+            <input type="text" id="neighborId" name="neighborId" class="w-full mt-1 p-2 border rounded-md" readonly data-error="Attendee ID not found. Please check and try again.">
+		    <div id="neighborSpinner" class="absolute right-3 top-2.5 hidden">
+		      <svg class="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+		        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+		        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+		      </svg>
+		    </div>
+		  </div>
       </div>
 
       <div>
-        <label for="householdSize" class="block font-semibold text-gray-700">Household Size<span class="text-red-500"> *</span></label>
-        <input type="number" id="householdSize" name="householdSize" required min="1" class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+        <label for="householdAdults" class="block font-semibold text-gray-700">How many adults are in your household?<span class="text-red-500"> *</span></label>
+        <input type="number" id="householdAdults" name="householdAdults" min="0" required class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+      </div>
+
+      <div>
+        <label for="householdChildren" class="block font-semibold text-gray-700">How many children are in your household?<span class="text-red-500"> *</span> <span class="text-sm text-gray-500">(over the age of 10)</span></label>
+        <input type="number" id="householdChildren" name="householdChildren" min="0" required class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
       </div>
 
       <div>
@@ -51,27 +99,182 @@
       </div>
 
       <div>
+        <label class="block font-semibold text-gray-700">CSA Pick-up Type<span class="text-red-500"> *</span></label>
+        <select name="pickupType" id="pickupType" required class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400">
+          <option value="">- Select -</option>
+          <option value="Delivery">Delivery</option>
+          <option value="Pick-up">Pick-up</option>
+        </select>
+      </div>
+
+      <div>
         <label for="info" class="block font-semibold text-gray-700">Other Information</label>
         <textarea id="info" name="info" rows="3" class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"></textarea>
       </div>
+			
+	  <input type="hidden" name="enrolleId" id="enrolleId">
 
       <div class="flex justify-center">
-		<button type="submit" class="px-6 py-3 bg-gradient-to-r from-emerald-400 to-lime-500 text-white font-semibold rounded-full hover:from-lime-500 hover:to-emerald-400 transition-transform transform hover:scale-105">Submit</button>
-	  </div>
-	  
+        <button type="submit" class="px-6 py-3 bg-gradient-to-r from-emerald-400 to-lime-500 text-white font-semibold rounded-full hover:from-lime-500 hover:to-emerald-400 transition-transform transform hover:scale-105">Submit</button>
+      </div>
     </form>
   </div>
 
-  <script>
-    document.getElementById('householdSize').addEventListener('input', function () {
-      const size = parseInt(this.value);
-      const bagInput = document.getElementById('bagSize');
-      if (size <= 2) {
-        bagInput.value = 'Small';
+<script>
+  function toggleOtherProgram() {
+    const programSelect = document.getElementById('program');
+    const otherProgramInput = document.getElementById('otherProgram');
+    otherProgramInput.classList.toggle('hidden', programSelect.value !== 'Other Event');
+  }
+
+  function toggleOtherProgramParticipation(checkbox) {
+    const otherProgramInput = document.getElementById('otherProgramParticipation');
+    otherProgramInput.classList.toggle('hidden', !checkbox.checked);
+  }
+
+  function handleMarketAttendance() {
+    const attended = document.getElementById('attendedMarket').value;
+    const firstDayQ = document.getElementById('firstDayQuestion');
+    const neighborIdField = document.getElementById('neighborIdField');
+	const attendeeIdField = document.getElementById('attendeeIdField');
+
+    if (attended === 'Yes') {
+      neighborIdField.classList.remove('hidden');
+	  attendeeIdField.classList.remove('hidden');
+      firstDayQ.classList.add('hidden');
+    } else if (attended === 'No') {
+      firstDayQ.classList.remove('hidden');
+      neighborIdField.classList.add('hidden');
+	  attendeeIdField.classList.add('hidden');
+    } else {
+      firstDayQ.classList.add('hidden');
+      neighborIdField.classList.add('hidden');
+	  attendeeIdField.classList.add('hidden');
+    }
+  }
+
+  function handleFirstDay() {
+    const firstDay = document.getElementById('firstDay').value;
+    const neighborIdField = document.getElementById('neighborIdField');
+	const attendeeIdField = document.getElementById('attendeeIdField');
+
+    if (firstDay === 'Yes') {
+      neighborIdField.classList.remove('hidden');
+	  attendeeIdField.classList.remove('hidden');
+    } else {
+      neighborIdField.classList.add('hidden');
+	  attendeeIdField.classList.add('hidden');
+    }
+  }
+
+  function calculateBagSize() {
+    const adults = parseInt(document.getElementById('householdAdults').value) || 0;
+    const children = parseInt(document.getElementById('householdChildren').value) || 0;
+    const bagInput = document.getElementById('bagSize');
+    const total = adults + children;
+
+    bagInput.value = total >= 6 ? 'Large' : 'Small';
+  }
+
+  document.getElementById('householdAdults').addEventListener('input', calculateBagSize);
+  document.getElementById('householdChildren').addEventListener('input', calculateBagSize);
+  
+  function fetchNeighborId() { debugger;
+    const attendeeId = document.getElementById('attendeeId').value;
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbxzfQFaCBhz-UNGC9UVqCEq2bjds7oRLUwjz86EV2xhYNx-mK7K397ZP30xZf9Z2U_yWw/exec';
+  	const spinner = document.getElementById('neighborSpinner');
+  	const neighborInput = document.getElementById('neighborId');
+	    
+  	spinner.classList.remove('hidden');
+    	neighborInput.value = '';
+  	neighborInput.setCustomValidity(""); // Clear old error
+   	neighborInput.reportValidity();      // Reset UI
+	    
+    fetch(`${scriptUrl}?attendeeid=${encodeURIComponent(attendeeId)}`)
+  	.then(res => res.json())
+  	.then(data => {
+  	  if (data.neighborId) {
+  		neighborInput.value = data.neighborId;
+        			neighborInput.setCustomValidity(""); // Valid
+  	  } else {
+  		neighborInput.value = '';
+        			neighborInput.setCustomValidity(neighborInput.getAttribute('data-error'));
+        			neighborInput.reportValidity();
+  	  }
+  	})
+  	.catch(err => console.error("Fetch error", err))
+  	.finally(() => {
+  		spinner.classList.add('hidden');
+  	});
+  }
+  
+  function generateEnrolleeId(e) {
+    e.preventDefault();
+	
+    const bagSize = document.getElementById('bagSize').value;
+    const indicator = bagSize === 'Large' ? 'L' : 'S';
+    const randomNumber = Math.floor(100 + Math.random() * 900); // Generates 100–999
+	
+    const enrolleId = `CSA-${indicator}${randomNumber}`;
+	
+	document.getElementById("enrolleId").value = enrolleId;
+	
+	const form = document.getElementById("csaEnrollmentForm");
+	const formData = new FormData(form);
+	
+	const selectedPglPrograms = [];
+    const checkboxes = document.querySelectorAll('input[name="pglPrograms"]:checked');
+	const otherProgramInput = document.getElementById('otherProgramParticipation').value.trim();
+    checkboxes.forEach(cb => {
+      if (cb.value === "Other") {
+        if (otherProgramInput) {
+          selected.push(otherProgramInput); // Replace 'Other' with user input
+        }
       } else {
-        bagInput.value = 'Large';
+        selected.push(cb.value);
       }
     });
-  </script>
+    allPglPrograms = selectedPglPrograms.join(", "); // Combine selected values into a single string
+	
+	formData.set('pglPrograms', allPglPrograms);
+	
+	sendData(formData, enrolleId);
+  }
+  
+  function sendData(formData, enrolleId) {
+	const data = {};
+	formData.forEach((value, key) => {
+	  data[key] = value;
+	});
+	
+	let successMessage = document.getElementById("successMessage");
+	successMessage.innerHTML = `<strong class="font-bold">Thank you!</strong> <span class="block sm:inline">Your Enrollee ID is <strong>${enrolleId}</strong>.</span>`;
+	successMessage.classList.remove('hidden');
+	  
+	document.getElementById("csaEnrollmentForm").reset();
+	window.scrollTo({ top: 0, behavior: 'smooth' });
+
+	fetch('https://script.google.com/macros/s/AKfycbzmZZrg8qiyBwzj-IzB4-OzsHPp-lxi1IK4gX73gCXHwFI5Pc0gF8bc3jqxZT47XXUzLQ/exec', {
+	  method: 'POST',
+	  headers: {
+		'Content-Type': 'text/plain;charset=utf-8',
+	  },
+	  body: JSON.stringify(data),
+	})
+	.then(response => response.text())
+	.then(result => {
+	  console.log('Success:', result);
+							
+	  setTimeout(function() {
+		successMessage.classList.add('hidden');
+	  }, 5000);
+	})
+	.catch(error => {
+	  console.error('Error:', error);
+	  // Handle the error here
+	});                
+  }
+
+</script>
 </body>
 </html>
