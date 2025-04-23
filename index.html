@@ -67,7 +67,7 @@
 	  
 	  <div id="attendeeIdField" class="hidden">
         <label for="attendeeId" class="block font-semibold text-gray-700">Attendee ID <span style='color: red;'>*</span></label>
-        <input type="text" id="attendeeId" name="attendeeId" class="w-full p-2 border rounded-md" required onchange="fetchNeighborId()">
+        <input type="text" id="attendeeId" name="attendeeId" class="w-full p-2 border rounded-md" onchange="fetchNeighborId()">
        </div>
 
       <div id="neighborIdField" class="hidden">
@@ -137,19 +137,23 @@
     const firstDayQ = document.getElementById('firstDayQuestion');
     const neighborIdField = document.getElementById('neighborIdField');
 	const attendeeIdField = document.getElementById('attendeeIdField');
+	  const attendeeId = document.getElementById('attendeeId');
 
     if (attended === 'Yes') {
       neighborIdField.classList.remove('hidden');
 	  attendeeIdField.classList.remove('hidden');
+	    attendeeId.required = true;
       firstDayQ.classList.add('hidden');
     } else if (attended === 'No') {
       firstDayQ.classList.remove('hidden');
       neighborIdField.classList.add('hidden');
 	  attendeeIdField.classList.add('hidden');
+	    attendeeId.required = false;
     } else {
       firstDayQ.classList.add('hidden');
       neighborIdField.classList.add('hidden');
 	  attendeeIdField.classList.add('hidden');
+	    attendeeId.required = true;
     }
   }
 
@@ -157,13 +161,16 @@
     const firstDay = document.getElementById('firstDay').value;
     const neighborIdField = document.getElementById('neighborIdField');
 	const attendeeIdField = document.getElementById('attendeeIdField');
+	  const attendeeId = document.getElementById('attendeeId');
 
     if (firstDay === 'Yes') {
       neighborIdField.classList.remove('hidden');
 	  attendeeIdField.classList.remove('hidden');
+	    attendeeId.required = true;
     } else {
       neighborIdField.classList.add('hidden');
 	  attendeeIdField.classList.add('hidden');
+	    attendeeId.required = false;
     }
   }
 
